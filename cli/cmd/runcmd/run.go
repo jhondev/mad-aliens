@@ -3,15 +3,16 @@ package runcmd
 import (
 	"fmt"
 	"mad-aliens/pkg/simulation"
-	"mad-aliens/pkg/worldmap"
-	"mad-aliens/pkg/worldmap/providers"
+	"mad-aliens/pkg/world"
+	"mad-aliens/pkg/world/providers"
+	"math/rand"
 
 	"github.com/spf13/cobra"
 )
 
 const (
 	flagWorldFilePath = "path"
-	flagAliensNumber  = "aliens"
+	flagAliensNumber  = "naliens"
 	defaultAliens     = 5
 )
 
@@ -24,8 +25,8 @@ func New() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			flags := cmd.Flags()
 			path, _ := flags.GetString(flagWorldFilePath)
-			aliens, _ := flags.GetInt(flagAliensNumber)
-			err := runSimulation(path, aliens)
+			naliens, _ := flags.GetInt(flagAliensNumber)
+			err := runSimulation(path, naliens)
 			if err != nil {
 				fmt.Printf("error running the simulation: %v", err)
 			}
@@ -33,14 +34,14 @@ func New() *cobra.Command {
 	}
 	runCmd.Flags().StringP(flagWorldFilePath, "p", "", "world map file path")
 	_ = runCmd.MarkFlagRequired(flagWorldFilePath)
-	runCmd.Flags().IntP(flagAliensNumber, "a", defaultAliens, "number of aliens in the simulation")
+	runCmd.Flags().IntP(flagAliensNumber, "n", defaultAliens, "number of aliens in the simulation")
 
 	return runCmd
 }
 
-func runSimulation(path string, aliens int) error {
+func runSimulation(path string, naliens int) error {
 	prov := providers.NewFile(path)
-	world := worldmap.New(prov)
-	sim := simulation.New(world, aliens)
-	return sim.Run()
+	wld := world.New(prov)
+	sim := simulation.New(wld, naliens)
+	return sim.Run(rand.Intn)
 }

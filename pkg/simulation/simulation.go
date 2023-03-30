@@ -2,24 +2,34 @@ package simulation
 
 import (
 	"fmt"
-	"mad-aliens/pkg/worldmap"
+	"mad-aliens/pkg/world"
 )
 
 type Simulation struct {
-	world  *worldmap.WorldMap
-	aliens int
+	world   *world.World
+	naliens int
 }
 
-func New(world *worldmap.WorldMap, aliens int) *Simulation {
+func New(wld *world.World, naliens int) *Simulation {
 	return &Simulation{
-		world:  world,
-		aliens: aliens,
+		world:   wld,
+		naliens: naliens,
 	}
 }
 
-func (sim *Simulation) Run() error {
-	fmt.Printf("Starting alien simulation with the following parameters:\n\n"+
-		"  aliens: %d\n\n", sim.aliens)
-	fmt.Println("Simulation running")
+// Run runs the simulation
+// randf: random function to return a pseudo-random number to position an alien
+func (sim *Simulation) Run(randf world.RandF) error {
+	fmt.Printf("Starting alien invasion simulation with the following parameters:\n\n"+
+		"  number of aliens: %d\n\n", sim.naliens)
+
+	fmt.Println("👽 Loading world")
+	err := sim.world.Load(sim.naliens, randf)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("👽 Mad aliens are invading")
+
 	return nil
 }
