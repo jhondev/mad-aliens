@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"mad-aliens/cli/cmd/runcmd"
 
 	"github.com/spf13/cobra"
 )
@@ -11,9 +11,8 @@ func New() *cobra.Command {
 		Use:   "mad",
 		Short: "Mad aliens helps you to simulate an alien invasion",
 		Long:  ``,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("mad aliens invasion simulation")
-		},
 	}
+	rootCmd.AddCommand(runcmd.New())
+
 	return rootCmd
 }

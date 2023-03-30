@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"mad-aliens/simulation/cmd"
+	"mad-aliens/cli/cmd"
 	"os"
 )
 
