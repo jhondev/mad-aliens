@@ -1,4 +1,4 @@
-package runcmd
+package run
 
 import (
 	"fmt"
@@ -13,7 +13,9 @@ import (
 const (
 	flagWorldFilePath = "path"
 	flagAliensNumber  = "naliens"
+	flagMaxMoves      = "maxmoves"
 	defaultAliens     = 5
+	defaultMaxMovs    = 10000
 )
 
 func New() *cobra.Command {
@@ -26,7 +28,8 @@ func New() *cobra.Command {
 			flags := cmd.Flags()
 			path, _ := flags.GetString(flagWorldFilePath)
 			naliens, _ := flags.GetInt(flagAliensNumber)
-			err := runSimulation(path, naliens)
+			maxmoves, _ := flags.GetInt(flagMaxMoves)
+			err := runSimulation(path, naliens, maxmoves)
 			if err != nil {
 				fmt.Printf("error running the simulation: %v", err)
 			}
@@ -35,13 +38,14 @@ func New() *cobra.Command {
 	runCmd.Flags().StringP(flagWorldFilePath, "p", "", "world map file path")
 	_ = runCmd.MarkFlagRequired(flagWorldFilePath)
 	runCmd.Flags().IntP(flagAliensNumber, "n", defaultAliens, "number of aliens in the simulation")
+	runCmd.Flags().IntP(flagMaxMoves, "m", defaultMaxMovs, "max number of moves")
 
 	return runCmd
 }
 
-func runSimulation(path string, naliens int) error {
+func runSimulation(path string, naliens int, maxmoves int) error {
 	prov := providers.NewFile(path)
 	wld := world.New(prov)
-	sim := simulation.New(wld, naliens)
-	return sim.Run(rand.Intn)
+	sim := simulation.New(wld, naliens, maxmoves, rand.Intn)
+	return sim.Run()
 }

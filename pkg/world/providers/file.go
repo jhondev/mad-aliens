@@ -21,20 +21,26 @@ func (fp *FileProvider) GetMap() (*world.Map, error) {
 		return nil, err
 	}
 	defer file.Close()
-	wm := &world.Map{Cities: make([]world.City, 0), GPS: make(world.GPS)}
+	wm := &world.Map{
+		Cities:      make([]world.CityName, 0),
+		Battlefield: make(world.Battlefield),
+	}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		parts := strings.Split(scanner.Text(), " ")
 		city := parts[0] // TODO: validation
-		wm.Cities = append(wm.Cities, world.City(city))
-		dirs := make(world.Direction)
+		wm.Cities = append(wm.Cities, world.CityName(city))
+		dirs := make(world.Directions)
 		for _, part := range parts[1:] {
 			dirParts := strings.Split(part, "=")
 			dir := dirParts[0] // TODO: validation
 			neighbor := dirParts[1]
-			dirs[world.Dir(dir)] = world.City(neighbor)
+			dirs[world.CityName(neighbor)] = world.Dir(dir)
 		}
-		wm.GPS[world.City(city)] = dirs
+		wm.Battlefield[world.CityName(city)] = world.Status{
+			Directions: dirs,
+			Aliens:     make(world.AliensStat),
+		}
 	}
 	return wm, nil
 }

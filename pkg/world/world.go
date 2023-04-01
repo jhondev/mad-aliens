@@ -1,27 +1,9 @@
 package world
 
-type City string
-type Dir string
-type Alien int
-type Direction = map[Dir]City
-type GPS = map[City]Direction
-type Aliens = map[Alien]City
-type Map struct {
-	Cities []City
-	GPS
-}
-type World struct {
-	provider Provider
-	*Map
-	Aliens
-}
-type Provider interface {
-	GetMap() (*Map, error)
-}
-type RandF func(int) int
+import "fmt"
 
 func New(prov Provider) *World {
-	return &World{provider: prov}
+	return &World{provider: prov, IW: make(Battlefield)}
 }
 
 // Load loads the World using the map data from the provider and positions aliens in random locations
@@ -40,7 +22,11 @@ func (wld *World) Load(naliens int, randf RandF) error {
 	for i := 1; i <= naliens; i++ {
 		randIdx := randf(len(wld.Cities))
 		city := wld.Cities[randIdx]
-		wld.Aliens[Alien(i)] = city
+		wld.Aliens[Alien(fmt.Sprint(i))] = city
+
+		status := wld.Battlefield[city]
+		status.Aliens[Alien(fmt.Sprint(i))] = true
+		wld.Battlefield[city] = status
 	}
 
 	return nil
