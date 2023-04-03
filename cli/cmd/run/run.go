@@ -2,9 +2,10 @@ package run
 
 import (
 	"fmt"
+	"mad-aliens/pkg/data/providers"
+	"mad-aliens/pkg/data/records"
 	"mad-aliens/pkg/simulation"
 	"mad-aliens/pkg/world"
-	"mad-aliens/pkg/world/providers"
 	"math/rand"
 
 	"github.com/spf13/cobra"
@@ -44,8 +45,44 @@ func New() *cobra.Command {
 }
 
 func runSimulation(path string, naliens int, maxmoves int) error {
+
+	fmt.Printf("Starting alien invasion simulation with the following setup:\n\n"+
+		"  number of aliens: %d\n"+
+		"  max moves:        %d\n\n", naliens, maxmoves)
+
+	fmt.Println("👽 Loading world.")
+
+	// use the file provider.
+	// we can create different provider types
+	// to grap the info from other sources like apis or databases
 	prov := providers.NewFile(path)
-	wld := world.New(prov)
-	sim := simulation.New(wld, naliens, maxmoves, rand.Intn)
-	return sim.Run()
+	// load the world with cities and random aliens positions
+	wld, err := world.Load(prov, naliens, maxmoves, rand.Intn)
+	if err != nil {
+		return err
+	}
+
+	// use memory records store.
+	// we can create different records store types
+	// to manage the history information of a simulation
+	// and recrete it based on the events and states
+	rec, err := records.NewMem(wld)
+	if err != nil {
+		return err
+	}
+
+	// create a new simulation object injecting the loaded values
+	sim := simulation.New(wld, rec, rand.Intn)
+
+	fmt.Printf("👽 Mad aliens are invading:\n\n")
+
+	err = sim.Run()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("👽 The mad aliens invasion has finished with the following report:\n\n")
+	sim.PrintReport()
+
+	return nil
 }

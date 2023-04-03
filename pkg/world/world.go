@@ -2,32 +2,31 @@ package world
 
 import "fmt"
 
-func New(prov Provider) *World {
-	return &World{provider: prov, IW: make(Battlefield)}
-}
-
-// Load loads the World using the map data from the provider and positions aliens in random locations
+// Load loads the World using the map data from the provider and
+// positions aliens in random locations
 // naliens: number of aliens to be positioned in the map
 // randf: random function to return a pseudo-random number to position an alien
-func (wld *World) Load(naliens int, randf RandF) error {
+func Load(prov Provider, naliens int, maxmoves int, randf RandF) (*World, error) {
 	// load map from provider
-	data, err := wld.provider.GetMap()
+	data, err := prov.GetMap()
 	if err != nil {
-		return err
+		return nil, err
 	}
+	wld := &World{}
 	wld.Map = data
+	wld.MaxMoves = maxmoves
 
 	// load aliens
 	wld.Aliens = make(Aliens)
 	for i := 1; i <= naliens; i++ {
-		randIdx := randf(len(wld.Cities))
-		city := wld.Cities[randIdx]
-		wld.Aliens[Alien(fmt.Sprint(i))] = city
+		randIdx := randf(len(wld.Map.Cities))
+		city := wld.Map.Cities[randIdx]
+		wld.Aliens[Alien(fmt.Sprint(i))] = &AlInfo{City: city, Trapped: false}
 
-		status := wld.Battlefield[city]
-		status.Aliens[Alien(fmt.Sprint(i))] = true
-		wld.Battlefield[city] = status
+		status := wld.Map.Battlefield[city]
+		status.Aliens[Alien(fmt.Sprint(i))] = false
+		wld.Map.Battlefield[city] = status
 	}
 
-	return nil
+	return wld, nil
 }
