@@ -1,5 +1,5 @@
 # Mad Aliens Simulation
-The mad alien's simulation helps you to simulate an invasion in a world built based on provided custom parameters.
+The mad alien's simulation helps you to simulate an invasion in a world built based on provided custom arguments.
 
 Aliens fight in cities and destroy them.
 
@@ -23,14 +23,13 @@ Aliens fight in cities and destroy them.
 ### Prerequisites
 - [Go 1.20](https://golang.org/dl/)
 
-### Tests
+### Print help info
 ```
-make test
-```
+make build
 
-### Debug
-```
-a default debug set of arguments is already configured. check .vscode/launch.json
+./mad -h
+
+./mad run -h
 ```
 
 ### Run with default values (10 aliens, 15 cities, 10 max moves)
@@ -47,16 +46,17 @@ make run-3-cities
 ```
 make build
 
-./mad run -p <file_path> -n <number of aliens> -m 10 <max moves>
+./mad run -p <file_path> -n <number of aliens> -m <max moves>
 ```
 
-### Print help info
+### Tests
 ```
-make build
+make test
+```
 
-./mad -h
-
-./mad run -h
+### Debug
+```
+a default debug set of arguments is already configured. check .vscode/launch.json
 ```
 
 ## Technical
@@ -69,7 +69,7 @@ battlefield states during the different events of the simulation.
 
 A state machine is also built to add the ability to recreate an entire simulation or particular scenarios, giving the option, for instance, to go back "in time" and have a different simulation result from a particular point in history. The state machine is managed in a records memory implementation that can be easily changed.
 
-The IoC principle is also applied for the random function to be used in the location and aliens' movements, this way we can inject different types of random function implementations depending on the scenario. In the default setup, the `math/rand` from the std library is injected.
+The IoC principle is also applied for the random function to be used in the location and alien's movements, this way we can inject different types of random function implementations depending on the scenario. In the default setup, the `math/rand` from the std library is injected.
 
 ### Structure
 Domain packages are separated from the `cli` that way we can have different types of outputs (`cli`, `api`, etc), it just needs to implement the core interfaces and high-order functions. The current `cli` uses the external cobra package to improve the user experience
